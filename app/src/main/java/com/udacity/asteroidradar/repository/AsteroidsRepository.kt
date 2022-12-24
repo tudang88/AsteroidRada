@@ -13,6 +13,7 @@ import com.udacity.asteroidradar.utils.isAfter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import timber.log.Timber
 
 class AsteroidsRepository(private val database: AsteroidDatabase) {
     // ViewModel will directly observe this data
@@ -26,7 +27,7 @@ class AsteroidsRepository(private val database: AsteroidDatabase) {
     suspend fun getAsteroids(filter: ObserverType) {
         var listResult = listOf<Asteroid>()
         withContext(Dispatchers.IO) {
-            println("Query database -> START")
+            Timber.d("Query database -> START")
             listResult = when (filter) {
                 ObserverType.TODAY -> {
                     database.asteroidDao.getTodayAsteroids().asDomainModel()
@@ -58,15 +59,15 @@ class AsteroidsRepository(private val database: AsteroidDatabase) {
                     database.asteroidDao.getWeekAsteroids().asDomainModel()
                 }
             }
-            println("Query database -> END")
+            Timber.d("Query database -> END")
         }
         /**
-         * get the today data if database have no items
+         * get the seven days data if database have no items
          */
         if (listResult.isEmpty()) {
-            val today = getTodayString()
+            val sevenDay = getNextSevenDaysFormattedDates()
             updateAsteroidDB(
-                today, today
+                sevenDay.first(), sevenDay.last()
             )
         }
         /**
@@ -83,13 +84,13 @@ class AsteroidsRepository(private val database: AsteroidDatabase) {
     suspend fun updateAsteroidDB(startDate: String, endDate: String) {
         withContext(Dispatchers.IO) {
             try {
-                println("get data from retrofit and insert to DB -> START")
+                Timber.d("get data from retrofit and insert to DB -> START")
                 val response = AsteroidApi.retrofitService.getProperties(startDate, endDate)
                 database.asteroidDao.insertAll(*parseAsteroidsJsonResult(JSONObject(response)).asDatabaseModel())
-                println("get data from retrofit and insert to DB -> END")
+                Timber.d("get data from retrofit and insert to DB -> END")
             } catch (e: Exception) {
-                println("get data from retrofit and insert to DB -> ERROR")
-                println("Failure : ${e.localizedMessage}")
+                Timber.d("get data from retrofit and insert to DB -> ERROR")
+                Timber.d("Failure : ${e.localizedMessage}")
             }
         }
     }

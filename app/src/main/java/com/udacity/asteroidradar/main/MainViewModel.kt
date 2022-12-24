@@ -16,6 +16,7 @@ import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 enum class ObserverType {
     TODAY,
@@ -80,11 +81,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun getImageOfDay() {
         viewModelScope.launch {
             try {
-                Log.i(TAG, "getImage of Day -> START")
+                Timber.d("getImage of Day -> START")
                 _imageOfDay.value = AsteroidApi.retrofitService.getImageOfDay()
-                Log.i(TAG, "getImage of Day -> END")
+                Timber.d("getImage of Day -> END")
             } catch (e: java.lang.Exception) {
-                Log.i(TAG, "getImage of Day -> FAILURE: ${e.localizedMessage}")
+                Timber.d("getImage of Day -> FAILURE: ${e.localizedMessage}")
             }
         }
     }
