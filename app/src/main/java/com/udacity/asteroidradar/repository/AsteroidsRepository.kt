@@ -62,15 +62,6 @@ class AsteroidsRepository(private val database: AsteroidDatabase) {
             Timber.d("Query database -> END")
         }
         /**
-         * get the seven days data if database have no items
-         */
-        if (listResult.isEmpty()) {
-            val sevenDay = getNextSevenDaysFormattedDates()
-            updateAsteroidDB(
-                sevenDay.first(), sevenDay.last()
-            )
-        }
-        /**
          * only update livedata on Main Thread
          */
         withContext(Dispatchers.Main) {
@@ -95,4 +86,17 @@ class AsteroidsRepository(private val database: AsteroidDatabase) {
         }
     }
 
+    /**
+     * fill data to empty database
+     */
+    suspend fun initDataBase() {
+        withContext(Dispatchers.IO) {
+            if (database.asteroidDao.isDatabaseEmpty()) {
+                val sevenDay = getNextSevenDaysFormattedDates()
+                updateAsteroidDB(
+                    sevenDay.first(), sevenDay.last()
+                )
+            }
+        }
+    }
 }

@@ -21,6 +21,9 @@ interface AsteroidDao {
     @Query("SELECT * FROM asteroid_table")
     fun getAll(): List<AsteroidRecord>
 
+    @Query("SELECT (SELECT COUNT(*) FROM asteroid_table) == 0")
+    fun isDatabaseEmpty(): Boolean
+
     /**
      * get all asteroid saved on database
      */

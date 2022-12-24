@@ -71,6 +71,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     init {
         viewModelScope.launch {
             getImageOfDay()
+            repository.initDataBase()
             changeFilter(ObserverType.TODAY)
         }
     }
@@ -85,6 +86,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _imageOfDay.value = AsteroidApi.retrofitService.getImageOfDay()
                 Timber.d("getImage of Day -> END")
             } catch (e: java.lang.Exception) {
+                _imageOfDay.value = null
                 Timber.d("getImage of Day -> FAILURE: ${e.localizedMessage}")
             }
         }

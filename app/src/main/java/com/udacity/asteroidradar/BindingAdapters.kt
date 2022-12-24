@@ -51,15 +51,36 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
 
 @BindingAdapter("imageUrl")
 fun bindImageViewToDisplayImageOfDay(imgView: ImageView, imgOfDay: PictureOfDay?) {
-    imgOfDay?.let {
-        val type = imgOfDay.mediaType
-        if (type == "image" && imgOfDay.url != "") {
-            val imgUri = imgOfDay.url.toUri().buildUpon().scheme("https").build()
-            Picasso.with(imgView.context)
-                .load(imgUri)
-                .placeholder(R.drawable.loading_animation)
-                .error(R.drawable.ic_broken_image)
-                .into(imgView)
+    if (null != imgOfDay) {
+        imgOfDay.let {
+            val type = imgOfDay.mediaType
+            if (type == "image" && imgOfDay.url != "") {
+                val imgUri = imgOfDay.url.toUri().buildUpon().scheme("https").build()
+                Picasso.with(imgView.context)
+                    .load(imgUri)
+                    .placeholder(R.drawable.loading_animation)
+                    .error(R.drawable.ic_broken_image)
+                    .into(imgView)
+                imgView.apply {
+                    scaleType = ImageView.ScaleType.FIT_XY
+                    contentDescription = ""
+                }
+
+            } else {
+                // in case image from nasa not qualify, show this image
+                imgView.apply {
+                    setImageResource(R.drawable.image_not_found)
+                    scaleType = ImageView.ScaleType.FIT_CENTER
+                    contentDescription = context.getString(R.string.image_of_the_day_not_available)
+                }
+            }
+        }
+    } else {
+        // offline mode will show this image
+        imgView.apply {
+            setImageResource(R.drawable.image_not_found)
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            contentDescription = context.getString(R.string.image_of_the_day_not_available)
         }
     }
 }
@@ -89,8 +110,10 @@ fun bindingLoadingProgressBar(progressBars: ProgressBar, status: AsteroidLoading
 fun bindingHazardousStatusImage(imgView: ImageView, isHazardous: Boolean) {
     val context = imgView.context
     if (isHazardous) {
-        imgView.contentDescription = context.getString(R.string.potential_hazardous_content_description)
+        imgView.contentDescription =
+            context.getString(R.string.potential_hazardous_content_description)
     } else {
-        imgView.contentDescription = context.getString(R.string.non_potential_hazardous_content_description)
+        imgView.contentDescription =
+            context.getString(R.string.non_potential_hazardous_content_description)
     }
 }
