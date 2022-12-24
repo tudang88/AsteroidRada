@@ -46,7 +46,7 @@ interface AsteroidDao {
     fun deleteOldAsteroids(today: String = getTodayString())
 
     /**
-     * delete everything in database
+     * delete all records
      */
     @Query("DELETE FROM asteroid_table")
     fun clearDatabase()
